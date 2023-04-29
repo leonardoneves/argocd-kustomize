@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_HUB_REPO = "my-dockerhub-repo/simplest-app"
+        IMAGE_TAG = "v${env.BUILD_NUMBER}"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build and Push Image') {
+            steps {
+                sh 'docker build -t $DOCKER_HUB_REPO:$IMAGE_TAG .'
+                withCredentials([string(credentialsId: 'DOCKER_HUB_CREDENTIALS', variable: 'DOCKER_HUB_CREDENTIALS')]) {
+                    sh 'docker login -u "$DOCKER_HUB_CREDENTIALS_USR" -p "$DOCKER_HUB_CREDENTIALS_PSW"'
+                    sh 'docker push $DOCKER_HUB_REPO:$IMAGE_TAG'
+                }
+            }
+        }
+        stage('Pull and Run Image') {
+            steps {
+                sh 'docker pull $DOCKER_HUB_REPO:$IMAGE_TAG'
+                sh 'docker run -d --name simplest-app -p 80:80 $DOCKER_HUB_REPO:$IMAGE_TAG'
+            }
+        }
+        stage('Verify Output') {
+            steps {
+                sh 'sleep 10' // wait for app to start up
+                script {
+                    def output = sh(script: 'curl -s localhost', returnStdout: true).trim()
+                    if (output != "Hello") {
+                        error "Output was not as expected: $output"
+                    }
+                }
+            }
+        }
+        stage('Update Kustomize Image') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'SSH_KEY', keyFileVariable: 'SSH_KEY_FILE', passphraseVariable: '', usernameVariable: 'SSH_USER')]) {
+                    sh '''
+                        ssh-agent bash -c "ssh-add $SSH_KEY_FILE; \
+                        git clone git@github.com:leonardoneves/argocd-kustomize.git; \
+                        cd argocd-kustomize/myapp/kustomize/overlays/dev; \
+                        sed -i 's/image: simplest-app:.*/image: my-dockerhub-repo\\/simplest-app:${IMAGE_TAG}/' patch.yaml; \
+                        git config --global user.email 'jenkins@jenkins.com'; \
+                        git config --global user.name 'Jenkins'; \
+                        git commit -am 'Update image to $IMAGE_TAG'; \
+                        git push"
+                    '''
+                }
+            }
+        }
+    }
+}
