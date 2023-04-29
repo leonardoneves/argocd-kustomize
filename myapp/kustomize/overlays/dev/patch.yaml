@@ -5,3 +5,6 @@ metadata:
   name: nginx-deployment
 spec:
   replicas: 2
+  containers:
+  - name: nginx-deployment
+    image: leoneves77/my-python-app
