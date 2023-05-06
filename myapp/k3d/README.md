@@ -1,7 +1,7 @@
 download:
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 create cluster:
-k3d cluster create mycluster --agents 3 --servers 1
+k3d cluster create mycluster --agents 3 --servers 1 --api-port 6443 -p 8080:80@loadbalancer
 fix metrics configuration to avoid warnings:
 kubectl patch deployment -n kube-system metrics-server --type=json -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'
 check all good:
