@@ -1,0 +1,28 @@
+---
+- name: Get kubeadm join command from master
+  hosts: master
+  gather_facts: yes
+  become: true
+  vars:
+    kubeadm_join_command: ""
+  tasks:
+    - name: Run kubeadm token create
+      command: kubeadm token create --print-join-command
+      register: kubeadm_token_output
+
+    - name: Save kubeadm join command in variable
+      set_fact:
+        kubeadm_join_command: "{{ kubeadm_token_output.stdout }}"
+      when: kubeadm_token_output.stdout is not none
+
+    - name: Print kubeadm join command
+      debug:
+        var: kubeadm_join_command
+
+- name: Join worker nodes to the cluster
+  hosts: workers
+  become: true
+  tasks:
+    - name: Join node to Kubernetes cluster
+      shell: "{{ hostvars['master']['kubeadm_join_command'] }}"
+      when: hostvars['master']['kubeadm_join_command'] is defined

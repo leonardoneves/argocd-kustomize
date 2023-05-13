@@ -1,0 +1,15 @@
+---
+- name: Add k8s hosts to /etc/hosts
+  hosts: all
+  become: true
+  tasks:
+    - name: Add k8s hosts to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ item }}"
+        state: present
+      with_items:
+        - "#k8s"
+        - "192.168.122.232 k8s-control"
+        - "192.168.122.122 k8s-worker1"
+        - "192.168.122.112 k8s-worker2"

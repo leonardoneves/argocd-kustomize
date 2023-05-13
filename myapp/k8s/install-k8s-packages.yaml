@@ -1,0 +1,32 @@
+---
+- name: Install Kubernetes components
+  hosts: all
+  become: true
+  tasks:
+    - name: Import Kubernetes apt-key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Add Kubernetes apt repository
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        filename: kubernetes
+
+    - name: Install and Kubernetes packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - kubeadm
+        - kubelet
+        - kubectl
+
+    - name: Mark Kubernetes packages as held
+      shell: "apt-mark hold {{ item }}"
+      with_items:
+        - kubeadm
+        - kubelet
+        - kubectl

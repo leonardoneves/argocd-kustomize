@@ -1,0 +1,18 @@
+---
+- name: Configure and restart containerd
+  hosts: all
+  become: true
+  tasks:
+    - name: Configure containerd
+      copy:
+        content: |
+          [plugins."io.containerd.grpc.v1.cri"]
+            systemd_cgroup = true
+        dest: /etc/containerd/config.toml
+      notify:
+        - restart containerd
+
+    - name: Restart containerd
+      systemd:
+        name: containerd
+        state: restarted

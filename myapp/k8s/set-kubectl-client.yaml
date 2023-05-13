@@ -1,0 +1,20 @@
+- name: Set kubectl for user neves
+  hosts: master
+  become: true
+  tasks:
+    - name: Create .kube directory for user neves
+      file:
+        path: /home/neves/.kube
+        state: directory
+        owner: neves
+        group: neves
+        mode: 0755
+
+    - name: Copy admin.conf to user neves
+      copy:
+        src: /etc/kubernetes/admin.conf
+        remote_src: true
+        dest: /home/neves/.kube/config
+        owner: neves
+        group: neves
+        mode: 0600

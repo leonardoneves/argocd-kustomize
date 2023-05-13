@@ -1,0 +1,8 @@
+---
+- name: Initialize Kubernetes cluster
+  hosts: master
+  become: true
+  tasks:
+    - name: Initialize Kubernetes cluster with kubeadm
+      command: kubeadm init --pod-network-cidr=192.168.0.0/16 --control-plane-endpoint=k8s-control
+#flannel: --pod-network-cidr=10.244.0.0/16

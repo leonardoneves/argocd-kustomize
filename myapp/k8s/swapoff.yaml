@@ -1,0 +1,20 @@
+---
+- name: Disable swap in boot
+  hosts: all
+  become: true
+  tasks:
+    - name: Comment out swap entry in /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: '^/swap'
+        state: absent 
+        backup: yes
+
+    - name: Turn off swaps
+      command: swapoff -a
+      changed_when: false
+
+    - name: Reboot system
+      reboot:
+        reboot_timeout: 300
+        post_reboot_delay: 30

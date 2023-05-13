@@ -1,0 +1,32 @@
+---
+- name: Get kubeadm join command from master
+  hosts: all
+  gather_facts: yes
+  become: true
+  vars:
+    kubeadm_join_command: ""
+  tasks:
+    - name: Run kubeadm token create
+      shell: "kubeadm token create --print-join-command"
+      register: kubeadm_token_output
+      when: "'master' in group_names"
+
+    - name: Save kubeadm join command in variable
+      set_fact:
+        join_command: "{{ kubeadm_token_output.stdout }}"
+      when: kubeadm_token_output is defined and "'master' in group_names" 
+
+    - name: Print kubeadm join command
+      debug:
+        var: join_command
+
+    - name: Remove kubelet.conf if exists
+      file:
+        path: /etc/kubernetes/kubelet.conf
+        state: absent
+      ignore_errors: true
+      when: join_command is defined and "'workers' in group_names"
+
+    - name: Join worker nodes to the cluster
+      shell: "{{ join_command }}"
+      when: join_command is defined and "'workers' in group_names"

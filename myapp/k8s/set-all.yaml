@@ -1,0 +1,12 @@
+---
+# ./master.yml
+
+- import_playbook: install-packages.yaml
+- import_playbook: swapoff.yaml
+- import_playbook: add-k8s-hosts.yaml
+- import_playbook: install-containerd-load-modules.yaml
+- import_playbook: add-apply-sysctl-conf.yaml
+- import_playbook: configure-containerd.yaml
+- import_playbook: install-enable-start-docker.yaml
+- import_playbook: install-k8s-packages.yaml
+- import_playbook: kubeadm-init-master.yaml
