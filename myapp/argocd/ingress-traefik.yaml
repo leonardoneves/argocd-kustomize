@@ -3,11 +3,14 @@ kind: Ingress
 metadata:
   name: argocd-ingress
   namespace: argocd
+  labels:
+    app: argocd
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
 spec:
   rules:
-  - http:
+  - host: argocd.example.com # Replace with your actual domain
+    http:
       paths:
       - path: /argocd
         pathType: Prefix
@@ -16,4 +19,3 @@ spec:
             name: argocd-server
             port:
               name: http
-

@@ -1,0 +1,7 @@
+controller:
+  service:
+    type: NodePort
+  config:
+    use-forwarded-headers: "true"
+  metrics:
+    enabled: true

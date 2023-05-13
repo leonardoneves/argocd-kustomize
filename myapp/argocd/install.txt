@@ -7,3 +7,6 @@ sudo cp argocd /usr/local/bin/
 sudo chmod 755 /usr/local/bin/argocd 
 
 wget https://github.com/argoproj/argo-cd/raw/stable/manifests/install.yaml
+
+kubectl port-forward svc/argocd-server -n argocd 8000:443
+
