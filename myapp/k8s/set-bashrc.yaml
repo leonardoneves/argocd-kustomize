@@ -1,0 +1,15 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Add kubectl completion and alias to bashrc
+      blockinfile:
+        path: ~/.bashrc
+        block: |
+          source <(kubectl completion bash)
+          alias k=kubectl
+          complete -o default -F __start_kubectl k
+          export do='--dry-run=client -o yaml'
+          alias kaf='k apply -f'
+          alias kad='k destroy -f'
+          export now='--grace-period 0 --force'
+#function ns () { kubectl config set-context --current --namespace=$1 }

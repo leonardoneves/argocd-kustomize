@@ -9,4 +9,5 @@
 - import_playbook: configure-containerd.yaml
 - import_playbook: install-enable-start-docker.yaml
 - import_playbook: install-k8s-packages.yaml
-- import_playbook: kubeadm-init-master.yaml
+- import_playbook: set-bashrc.yaml
+#- import_playbook: kubeadm-init-master.yaml
