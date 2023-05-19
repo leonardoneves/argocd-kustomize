@@ -8,10 +8,14 @@
           source <(kubectl completion bash)
           alias k=kubectl
           complete -o default -F __start_kubectl k
-          export do='--dry-run=client -o yaml'
           alias kaf='k apply -f'
           alias kad='k delete --grace-period 0 --force -f'
           export now='--grace-period 0 --force'
+          alias gp='kubectl get po'
+          alias gn='kubectl get no'
+          alias gd='kubectl get deploy'
+          alias gs='kubectl get svc'
+          export do='--dry-run=client -o yaml'
           function ns () { 
             kubectl config set-context --current --namespace=$1
           }
