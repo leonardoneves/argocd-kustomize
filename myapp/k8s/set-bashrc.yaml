@@ -10,6 +10,8 @@
           complete -o default -F __start_kubectl k
           export do='--dry-run=client -o yaml'
           alias kaf='k apply -f'
-          alias kad='k destroy -f'
+          alias kad='k delete --grace-period 0 --force -f'
           export now='--grace-period 0 --force'
-#function ns () { kubectl config set-context --current --namespace=$1 }
+          function ns () { 
+            kubectl config set-context --current --namespace=$1
+          }
